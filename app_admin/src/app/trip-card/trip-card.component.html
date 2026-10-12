@@ -1,15 +1,55 @@
 <div class="card">
     <div class="card-header">{{ trip.name }}</div>
     <img src="assets/images/{{ trip.image }}" alt="trip thumbnail" class="card-img-top">
+
     <div class="card-body">
         <h6 class="card-subtitle mb-2 text-muted">
             {{ trip.resort }}
         </h6>
+
         <p class="card-subtitle mt-3 mb-3 text-muted">
             {{trip.length}} only {{trip.perPerson|currency:'USD':'symbol'}} per person
         </p>
+
         <p class="card-text" [innerHTML]="trip.description">
         </p>
+
+        <!-- Displays the current trip rating -->
+        <div class="trip-rating mb-3">
+            <p class="mb-1">
+                <strong>Trip Rating:</strong>
+                {{ trip.rating ? trip.rating + '/5' : 'Not rated yet' }}
+            </p>
+
+            <!-- Allows logged-in users to select a rating -->
+            <div *ngIf="isLoggedIn()">
+                <p class="mb-1">Rate this trip:</p>
+
+                <button
+                    *ngFor="let star of [1, 2, 3, 4, 5]"
+                    type="button"
+                    class="rating-star"
+                    [class.selected]="star <= selectedRating"
+                    [disabled]="isSubmittingRating"
+                    (click)="selectedRating = star">
+                    ★
+                </button>
+
+                <div class="mt-2">
+                    <button
+                        class="btn btn-primary"
+                        [disabled]="selectedRating === 0 || isSubmittingRating"
+                        (click)="submitRating()">
+                        {{ isSubmittingRating ? 'Submitting...' : 'Submit Rating' }}
+                    </button>
+                </div>
+
+                <p *ngIf="ratingMessage" class="mt-2">
+                    {{ ratingMessage }}
+                </p>
+            </div>
+        </div>
+
         <div *ngIf="isLoggedIn()">
             <button (click)="editTrip(trip)" class="btn btn-info">Edit Trip</button>
             <button (click)="deleteTrip(trip)" class="btn btn-danger">Delete Trip</button>

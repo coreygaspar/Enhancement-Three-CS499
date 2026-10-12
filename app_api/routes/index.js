@@ -61,4 +61,10 @@ router
     .put(authenticateJWT, tripsController.tripsUpdateTrip)
     .delete(authenticateJWT, tripsController.tripsDeleteTrip);
 
+
+// PUT: /trips/:tripCode/rating - Updates a trip rating
+router
+    .route('/trips/:tripCode/rating')
+    .put(authenticateJWT, tripsController.tripsRateTrip);
+
 module.exports = router;

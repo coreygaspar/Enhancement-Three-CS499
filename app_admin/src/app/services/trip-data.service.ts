@@ -41,6 +41,14 @@ export class TripDataService {
     return this.http.delete<Trip[]>(this.url + '/' + tripCode);
   }
 
+    // Updates the rating for an existing trip
+  rateTrip(tripCode: string, rating: number): Observable<Trip> {
+    return this.http.put<Trip>(
+      this.url + '/' + tripCode + '/rating',
+      { rating: rating }
+    );
+  }
+
   // Call to our /login endpoint, returns JWT
   login(user: User, passwd: string): Observable<AuthResponse> {
     return this.handleAuthAPICall('login', user, passwd);

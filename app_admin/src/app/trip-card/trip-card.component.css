@@ -1,0 +1,19 @@
+/* Styles the trip rating stars */
+.rating-star {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 25px;
+    cursor: pointer;
+    padding: 0 3px;
+}
+
+/* Highlights selected stars */
+.rating-star.selected {
+    color: #ffc107;
+}
+
+/* Prevents the stars from looking clickable while disabled */
+.rating-star:disabled {
+    cursor: default;
+}

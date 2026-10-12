@@ -114,6 +114,55 @@ const tripsUpdateTrip = async (req, res) => {
     // console.log(q);
 };
 
+// PUT: /trips/:tripCode/rating - Updates a trip rating
+const tripsRateTrip = async (req, res) => {
+
+    // Get the submitted rating
+    const rating = Number(req.body.rating);
+
+    // Validate that the rating is a whole number between 1 and 5
+    if (
+        req.body.rating === undefined ||
+        req.body.rating === null ||
+        req.body.rating === '' ||
+        !Number.isInteger(rating) ||
+        rating < 1 ||
+        rating > 5
+    ) {
+        return res
+            .status(400)
+            .json({ message: 'Rating must be a whole number between 1 and 5' });
+    }
+
+    try {
+        // Find the trip and update its rating
+        const q = await Model
+            .findOneAndUpdate(
+                { code: req.params.tripCode },
+                { $set: { rating: rating } },
+                { new: true, runValidators: true }
+            )
+            .exec();
+
+        // Check whether the trip exists
+        if (!q) {
+            return res
+                .status(404)
+                .json({ message: 'Trip not found' });
+        }
+
+        // Return the updated trip
+        return res
+            .status(200)
+            .json(q);
+
+    } catch (err) {
+        return res
+            .status(500)
+            .json({ message: 'Unable to update trip rating' });
+    }
+};
+
 // DELETE: /trips/:tripCode - Deletes an existing Trip
 const tripsDeleteTrip = async (req, res) => {
     const q = await Model
@@ -137,5 +186,6 @@ module.exports = {
     tripsFindByCode,
     tripsAddTrip,
     tripsUpdateTrip,
-    tripsDeleteTrip
+    tripsDeleteTrip,
+    tripsRateTrip
 };

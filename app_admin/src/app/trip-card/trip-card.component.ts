@@ -20,10 +20,20 @@ export class TripCardComponent implements OnInit {
     private router: Router,
     private authenticationService: AuthenticationService,
     private tripDataService: TripDataService
-  ) {}
+  ) { }
+
+  // Stores the rating selected by the user
+  selectedRating: number = 0;
+
+  // Tracks the rating submission status
+  isSubmittingRating: boolean = false;
+
+  // Displays feedback after submitting a rating
+  ratingMessage: string = '';
 
   ngOnInit(): void {
-    
+    // Load the existing trip rating, if one is available
+    this.selectedRating = this.trip.rating ?? 0;
   }
 
   public editTrip(trip: Trip) {
@@ -33,21 +43,46 @@ export class TripCardComponent implements OnInit {
   }
 
   public deleteTrip(trip: Trip): void {
-  if (confirm('Are you sure you want to delete this trip?')) {
-    this.tripDataService.deleteTrip(trip.code)
+    if (confirm('Are you sure you want to delete this trip?')) {
+      this.tripDataService.deleteTrip(trip.code)
+        .subscribe({
+          next: () => {
+            window.location.reload();
+          },
+          error: (error: any) => {
+            console.log('Error: ' + error);
+          }
+        });
+    }
+  }
+
+  // Submits a rating for the selected trip
+  public submitRating(): void {
+    if (this.selectedRating < 1 || this.selectedRating > 5) {
+      this.ratingMessage = 'Please select a rating between 1 and 5 stars.';
+      return;
+    }
+
+    this.isSubmittingRating = true;
+    this.ratingMessage = '';
+
+    this.tripDataService.rateTrip(this.trip.code, this.selectedRating)
       .subscribe({
-        next: () => {
-          window.location.reload();
+        next: (updatedTrip: Trip) => {
+          // Update the displayed rating
+          this.trip.rating = updatedTrip.rating;
+          this.ratingMessage = 'Rating saved successfully.';
+          this.isSubmittingRating = false;
         },
         error: (error: any) => {
-          console.log('Error: ' + error);
+          console.log('Error submitting rating:', error);
+          this.ratingMessage = 'Unable to save rating. Please try again.';
+          this.isSubmittingRating = false;
         }
       });
   }
-}
 
-  public isLoggedIn()
-  {
+  public isLoggedIn() {
     return this.authenticationService.isLoggedIn();
   }
 }
